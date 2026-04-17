@@ -88,4 +88,4 @@ Variaveis importantes:
 - Usuario padrao: duda
 - Senha padrao: 199612@Vs
 
-Depois do primeiro login, altere usuario e senha na pagina Mudar senha.
+A lista de clientes fica na pagina Minha agenda. Se quiser trocar usuario ou senha, ajuste direto no codigo ou nas variaveis de ambiente.

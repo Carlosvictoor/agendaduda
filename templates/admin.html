@@ -10,7 +10,7 @@
       <div>
         <p class="kicker">Painel admin</p>
         <h1>Controle da operacao</h1>
-        <p class="hero__text">Veja o financeiro previsto, acompanhe as clientes agendadas e abra a conversa certa no WhatsApp em segundos.</p>
+        <p class="hero__text">Veja o financeiro previsto e acompanhe os numeros principais do studio em um unico lugar.</p>
       </div>
       <div class="admin-hero__note">
         <span>Hoje</span>
@@ -64,13 +64,13 @@
       </article>
     </section>
 
-    <section class="admin-grid">
-      <section class="panel admin-table-panel">
+    <section class="content-grid">
+      <section class="panel">
         <div class="panel-heading panel-heading--split admin-panel-heading">
           <div>
-            <p class="section-label">Agenda</p>
-            <h2>Clientes agendadas</h2>
-            <p class="admin-panel-subtitle">Veja horario, servico e contato de forma mais direta.</p>
+            <p class="section-label">Resumo</p>
+            <h2>Painel principal</h2>
+            <p class="admin-panel-subtitle">Use Minha agenda para ver e confirmar clientes agendadas.</p>
           </div>
           <div class="admin-panel-badge">
             <span>Agenda ativa</span>
@@ -78,75 +78,16 @@
           </div>
         </div>
 
-        {% if appointments %}
-          <div class="admin-table-wrap">
-            <table class="admin-table admin-table--compact">
-              <thead>
-                <tr>
-                  <th>Cliente</th>
-                  <th>Data</th>
-                  <th>Servico</th>
-                  <th>Duracao</th>
-                  <th>Valor</th>
-                  <th>Status</th>
-                  <th>WhatsApp</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for appointment in appointments %}
-                  <tr>
-                    <td data-label="Cliente">
-                      <strong>{{ appointment.client_name }}</strong>
-                      <span class="appointment-status-badge {% if appointment.confirmed %}is-confirmed{% else %}is-pending{% endif %}">
-                        {% if appointment.confirmed %}Confirmado{% else %}Pendente{% endif %}
-                      </span>
-                      {% if appointment.notes %}
-                        <small>{{ appointment.notes }}</small>
-                      {% endif %}
-                    </td>
-                    <td data-label="Data">{{ appointment.appointment_date.strftime('%d/%m/%Y') }}<br />{{ appointment.appointment_time }}</td>
-                    <td data-label="Servico">{{ appointment.service }}</td>
-                    <td data-label="Duracao">{{ appointment.duration_minutes|duration_label }}</td>
-                    <td data-label="Valor">{{ appointment.price|currency_br }}</td>
-                    <td data-label="Status">
-                      <span class="appointment-status-text {% if appointment.confirmed %}is-confirmed{% else %}is-pending{% endif %}">
-                        {% if appointment.confirmed %}Confirmado{% else %}Pendente{% endif %}
-                      </span>
-                    </td>
-                    <td data-label="WhatsApp">
-                      <a href="{{ whatsapp_link(appointment.phone, appointment.client_name, appointment.service, appointment.appointment_date, appointment.appointment_time) }}" target="_blank" rel="noreferrer" class="table-whatsapp" aria-label="Abrir conversa com {{ appointment.client_name }} no WhatsApp">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path d="M12 2.2A9.8 9.8 0 0 0 3.7 17l-1.4 4.8 5-1.3A9.8 9.8 0 1 0 12 2.2Zm0 17.8a8.1 8.1 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.1 8.1 0 1 1 12 20Zm4.5-6.1c-.2-.1-1.3-.6-1.5-.7-.2-.1-.4-.1-.5.1s-.6.7-.7.9c-.1.1-.3.2-.5.1a6.6 6.6 0 0 1-2-1.2 7.2 7.2 0 0 1-1.3-1.7c-.1-.2 0-.4.1-.5l.4-.5c.1-.1.1-.3 0-.4l-.7-1.7c-.1-.3-.3-.3-.5-.3h-.4c-.1 0-.4.1-.6.3s-.8.8-.8 1.9.8 2.2.9 2.3a9.3 9.3 0 0 0 3.6 3.2c1.8.8 1.8.5 2.1.5s1.3-.5 1.5-1 .2-1 .1-1.1c0-.1-.2-.2-.4-.3Z" />
-                        </svg>
-                        {{ appointment.phone }}
-                      </a>
-                    </td>
-                    <td data-label="Acao">
-                      <div class="admin-table-actions">
-                        {% if not appointment.confirmed %}
-                          <form method="post" action="{{ url_for('confirm_appointment', appointment_id=appointment.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <button type="submit" class="button button--secondary button--compact">Confirmar</button>
-                          </form>
-                        {% endif %}
-                        <form method="post" action="{{ url_for('cancel_appointment', appointment_id=appointment.id) }}">
-                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                          <input type="hidden" name="next_view" value="admin_dashboard" />
-                          <button type="submit" class="button button--ghost button--compact">Cancelar</button>
-                        </form>
-                      </div>
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        {% else %}
-          <div class="empty-state">
-            <p>Nenhuma cliente agendada no momento.</p>
-          </div>
-        {% endif %}
+        <div class="guide-list">
+          <article>
+            <strong>Minha agenda</strong>
+            <span>Veja clientes, confirme agendamentos, cancele horarios e abra o WhatsApp.</span>
+          </article>
+          <article>
+            <strong>Configuracoes</strong>
+            <span>Gerencie servicos e os horarios de funcionamento que valem para todos os dias.</span>
+          </article>
+        </div>
       </section>
     </section>
   </main>

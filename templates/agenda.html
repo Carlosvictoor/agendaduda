@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Minha agenda | {{ brand_name }}{% endblock %}
+
+{% block body_class %}theme-admin{% endblock %}
+
+{% block content %}
+  <main class="page-shell">
+    <section class="admin-hero panel panel--hero admin-hero">
+      <div>
+        <p class="kicker">Minha agenda</p>
+        <h1>Clientes agendadas</h1>
+        <p class="hero__text">Acompanhe seus atendimentos, confirme horarios e entre em contato com suas clientes.</p>
+      </div>
+      <div class="admin-hero__note">
+        <span>Agenda ativa</span>
+        <strong>{{ stats.scheduled_count }} horarios</strong>
+      </div>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <section class="flash-stack">
+          {% for category, message in messages %}
+            <article class="flash flash-{{ category }}">{{ message }}</article>
+          {% endfor %}
+        </section>
+      {% endif %}
+    {% endwith %}
+
+    {% if appointments %}
+      <div class="agenda-cards">
+        {% for appointment in appointments %}
+          <article class="agenda-card">
+            <div class="agenda-card__header">
+              <div>
+                <h3 class="agenda-card__name">
+                  {{ appointment.client_name }}
+                  <small>{{ appointment.service }}{% if appointment.notes %} · {{ appointment.notes }}{% endif %}</small>
+                </h3>
+              </div>
+              <div class="agenda-card__slot">
+                <strong>{{ appointment.appointment_time }}</strong>
+                <span>{{ appointment.appointment_date.strftime('%d/%m/%Y') }}</span>
+              </div>
+            </div>
+
+            <div class="agenda-card__details">
+              <div class="agenda-detail">
+                <span>Duracao</span>
+                <strong>{{ appointment.duration_minutes|duration_label }}</strong>
+              </div>
+              <div class="agenda-detail">
+                <span>Valor</span>
+                <strong>{{ appointment.price|currency_br }}</strong>
+              </div>
+              <div class="agenda-detail">
+                <span>Telefone</span>
+                <strong>{{ appointment.phone }}</strong>
+              </div>
+              <div class="agenda-detail">
+                <span>Status</span>
+                <strong>
+                  <span class="appointment-status-text {% if appointment.confirmed %}is-confirmed{% else %}is-pending{% endif %}">
+                    {% if appointment.confirmed %}Confirmado{% else %}Pendente{% endif %}
+                  </span>
+                </strong>
+              </div>
+            </div>
+
+            <div class="agenda-card__footer">
+              {% if not appointment.confirmed %}
+                <form method="post" action="{{ url_for('confirm_appointment', appointment_id=appointment.id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                  <button type="submit" class="button button--secondary button--compact">Confirmar</button>
+                </form>
+              {% endif %}
+              <form method="post" action="{{ url_for('cancel_appointment', appointment_id=appointment.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <input type="hidden" name="next_view" value="admin_agenda" />
+                <button type="submit" class="button button--ghost button--compact">Cancelar</button>
+              </form>
+              <a href="{{ whatsapp_link(appointment.phone, appointment.client_name, appointment.service, appointment.appointment_date, appointment.appointment_time) }}" target="_blank" rel="noreferrer" class="table-whatsapp" aria-label="Abrir conversa com {{ appointment.client_name }} no WhatsApp">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2.2A9.8 9.8 0 0 0 3.7 17l-1.4 4.8 5-1.3A9.8 9.8 0 1 0 12 2.2Zm0 17.8a8.1 8.1 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.1 8.1 0 1 1 12 20Zm4.5-6.1c-.2-.1-1.3-.6-1.5-.7-.2-.1-.4-.1-.5.1s-.6.7-.7.9c-.1.1-.3.2-.5.1a6.6 6.6 0 0 1-2-1.2 7.2 7.2 0 0 1-1.3-1.7c-.1-.2 0-.4.1-.5l.4-.5c.1-.1.1-.3 0-.4l-.7-1.7c-.1-.3-.3-.3-.5-.3h-.4c-.1 0-.4.1-.6.3s-.8.8-.8 1.9.8 2.2.9 2.3a9.3 9.3 0 0 0 3.6 3.2c1.8.8 1.8.5 2.1.5s1.3-.5 1.5-1 .2-1 .1-1.1c0-.1-.2-.2-.4-.3Z" />
+                </svg>
+                Enviar lembrete
+              </a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state" style="margin-top:24px">
+        <p>Nenhuma cliente agendada no momento.</p>
+      </div>
+    {% endif %}
+  </main>
+{% endblock %}

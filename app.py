@@ -310,16 +310,44 @@ def whatsapp_link(phone, client_name, service=None, appointment_date=None, appoi
     if not digits:
         return None
 
-    parts = [f"Oi, {client_name}! Aqui e a Duda Leumann Nails."]
-
-    if service:
-        parts.append(f"Seu horario para {service}")
     if appointment_date and appointment_time:
+        tomorrow = date.today() + timedelta(days=1)
+        if appointment_date == tomorrow:
+            schedule_text = f"amanha as {appointment_time}"
+        elif appointment_date == date.today():
+            schedule_text = f"hoje as {appointment_time}"
+        else:
+            formatted_date = appointment_date.strftime("%d/%m/%Y")
+            schedule_text = f"no dia {formatted_date} as {appointment_time}"
+    elif appointment_date:
         formatted_date = appointment_date.strftime("%d/%m/%Y")
-        parts.append(f"esta reservado para {formatted_date} as {appointment_time}.")
-    parts.append("Se precisar ajustar algo, me chama por aqui.")
+        schedule_text = f"no dia {formatted_date}"
+    elif appointment_time:
+        schedule_text = f"as {appointment_time}"
+    else:
+        schedule_text = "conforme combinado"
 
-    message = quote(" ".join(parts))
+    message = quote(
+        "\n".join(
+            [
+                f"Ola, {client_name}, tudo bem?",
+                f"Passando para lembra-la que seu compromisso esta agendado para {schedule_text}.",
+                "",
+                "Estou ansiosa para te atender!",
+                "",
+                "Endereco: Rua 1o de Janeiro, 660, sala 02 - Nova Mirim, Praia Grande - SP, 11704-800",
+                "(Em cima do Bar Lider do Litoral, porta ao lado. Em frente ao Mc Donalds)",
+                "",
+                "*Aviso Importante:*",
+                "",
+                "- A tolerancia para atrasos e de 10 minutos. Apos esse periodo, o atendimento sera automaticamente cancelado para nao atrasar a proxima cliente.",
+                "- Nao e permitido levar acompanhantes.",
+                "- Nao realizar cuticulagem 5 dias antes do procedimento.",
+                "",
+                "Agradecemos a compreensao!",
+            ]
+        )
+    )
     return f"https://wa.me/{digits}?text={message}"
 
 
@@ -730,7 +758,6 @@ def admin_dashboard():
     dashboard = build_dashboard_data()
     return render_template(
         "admin.html",
-        appointments=dashboard["appointments"],
         stats=dashboard["stats"],
     )
 
@@ -760,13 +787,14 @@ def update_business_hours():
     return redirect(url_for("admin_settings"))
 
 
-@app.get("/admin/change-password")
+@app.get("/admin/agenda")
 @admin_required
-def admin_change_password():
-    admin = get_admin_account()
+def admin_agenda():
+    dashboard = build_dashboard_data()
     return render_template(
-        "change_password.html",
-        admin_username=admin.username if admin else "",
+        "agenda.html",
+        appointments=dashboard["appointments"],
+        stats=dashboard["stats"],
     )
 
 
@@ -931,19 +959,19 @@ def update_admin_security():
 
     if not admin or not check_password_hash(admin.password_hash, current_password):
         flash("Senha atual invalida.", "error")
-        return redirect(url_for("admin_change_password"))
+        return redirect(url_for("admin_login"))
 
     if not new_username:
         flash("Informe um usuario valido.", "error")
-        return redirect(url_for("admin_change_password"))
+        return redirect(url_for("admin_login"))
 
     if new_password:
         if len(new_password) < 6:
             flash("A nova senha precisa ter pelo menos 6 caracteres.", "error")
-            return redirect(url_for("admin_change_password"))
+            return redirect(url_for("admin_login"))
         if new_password != confirm_password:
             flash("A confirmacao da nova senha nao confere.", "error")
-            return redirect(url_for("admin_change_password"))
+            return redirect(url_for("admin_login"))
         admin.password_hash = generate_password_hash(new_password)
 
     admin.username = new_username
@@ -963,6 +991,8 @@ def cancel_appointment(appointment_id):
     next_view = request.form.get("next_view", "index")
     if next_view == "admin_dashboard" and session.get("is_admin"):
         return redirect(url_for("admin_dashboard"))
+    if next_view == "admin_agenda" and session.get("is_admin"):
+        return redirect(url_for("admin_agenda"))
     return redirect(url_for("index"))
 
 
@@ -976,7 +1006,7 @@ def confirm_appointment(appointment_id):
         flash("Agendamento confirmado.", "success")
     else:
         flash("Esse agendamento ja estava confirmado.", "success")
-    return redirect(url_for("admin_dashboard"))
+    return redirect(url_for("admin_agenda"))
 
 
 with app.app_context():
