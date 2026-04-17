@@ -172,24 +172,6 @@ class BlockedPeriod(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 
-def ensure_table_column(table_name, column_name, sql_definition):
-    with db.engine.begin() as connection:
-        columns = {row[1] for row in connection.execute(text(f"PRAGMA table_info({table_name})"))}
-        if columns and column_name not in columns:
-            connection.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {sql_definition}"))
-
-
-def ensure_database_schema():
-    ensure_table_column("appointment", "price", "price FLOAT NOT NULL DEFAULT 0")
-    ensure_table_column(
-        "appointment", "duration_minutes", "duration_minutes INTEGER NOT NULL DEFAULT 60"
-    )
-    ensure_table_column("appointment", "confirmed", "confirmed BOOLEAN NOT NULL DEFAULT 0")
-    ensure_table_column(
-        "service", "duration_minutes", "duration_minutes INTEGER NOT NULL DEFAULT 60"
-    )
-
-
 def seed_default_services():
     existing_services = {service.name: service for service in Service.query.all()}
 
@@ -999,7 +981,6 @@ def confirm_appointment(appointment_id):
 
 with app.app_context():
     db.create_all()
-    ensure_database_schema()
     seed_default_services()
     seed_available_hours()
     ensure_admin_account()
