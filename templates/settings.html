@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}Configurações | {{ brand_name }}{% endblock %}
+
+{% block body_class %}theme-admin{% endblock %}
+
+{% block content %}
+  <main class="page-shell">
+    <section class="admin-hero panel panel--hero admin-hero">
+      <div>
+        <p class="kicker">Configurações</p>
+        <h1>Ajustes do studio</h1>
+        <p class="hero__text">Marque apenas os horarios em que a Duda vai atender. As clientes vao ver exatamente esses horarios disponiveis.</p>
+      </div>
+      <div class="admin-hero__note">
+        <span>Resumo</span>
+        <strong>{{ stats.service_count }} servicos</strong>
+      </div>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <section class="flash-stack">
+          {% for category, message in messages %}
+            <article class="flash flash-{{ category }}">{{ message }}</article>
+          {% endfor %}
+        </section>
+      {% endif %}
+    {% endwith %}
+
+    <section class="admin-sidebar admin-sidebar--settings">
+      <section class="panel admin-side-panel admin-tool-group admin-tool-group--panel settings-panel">
+        <div class="admin-tool-group__header">
+          <div>
+            <h3>Servicos</h3>
+          </div>
+          <span class="admin-mini-badge">{{ stats.service_count }} ativos</span>
+        </div>
+
+        <section class="admin-subpanel">
+          <div class="admin-subpanel__header">
+            <strong>Novo servico</strong>
+          </div>
+          <form method="post" action="{{ url_for('create_service') }}" class="appointment-form compact-form admin-inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <label>
+              <span>Nome do servico</span>
+              <input type="text" name="name" placeholder="Ex.: Blindagem premium" required />
+            </label>
+            <div class="field-row field-row--compact">
+              <label>
+                <span>Preco</span>
+                <input type="text" name="price" placeholder="120,00" required />
+              </label>
+              <label>
+                <span>Duracao</span>
+                <input type="number" name="duration_minutes" min="30" step="30" placeholder="90" required />
+              </label>
+            </div>
+            <button type="submit" class="button button--primary button--full">Adicionar servico</button>
+          </form>
+        </section>
+
+        <div class="service-admin-list service-admin-list--compact">
+          {% for service in services %}
+            <details class="service-editor service-editor--accordion">
+              <summary class="service-editor__summary">
+                <div>
+                  <strong>{{ service.name }}</strong>
+                  <small>{{ service.duration_minutes|duration_label }} • {{ service.price|currency_br }}</small>
+                </div>
+                <span class="service-editor__status {% if service.active %}is-active{% else %}is-inactive{% endif %}">
+                  {% if service.active %}Ativo{% else %}Inativo{% endif %}
+                </span>
+              </summary>
+              <form method="post" action="{{ url_for('update_service', service_id=service.id) }}" class="appointment-form compact-form service-editor__form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <label>
+                  <span>Nome</span>
+                  <input type="text" name="name" value="{{ service.name }}" required />
+                </label>
+                <div class="field-row field-row--compact">
+                  <label>
+                    <span>Preco</span>
+                    <input type="text" name="price" value="{{ '%.2f'|format(service.price) }}" required />
+                  </label>
+                  <label>
+                    <span>Duracao</span>
+                    <input type="number" name="duration_minutes" value="{{ service.duration_minutes }}" min="30" step="30" required />
+                  </label>
+                </div>
+                <label class="switch-row switch-row--boxed">
+                  <span>Servico ativo</span>
+                  <input type="checkbox" name="active" {% if service.active %}checked{% endif %} />
+                </label>
+                <button type="submit" class="button button--ghost button--full">Salvar alteracoes</button>
+              </form>
+            </details>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="panel admin-side-panel admin-tool-group admin-tool-group--panel settings-panel">
+        <div class="admin-tool-group__header">
+          <div>
+            <h3>Horários de funcionamento</h3>
+          </div>
+          <span class="admin-mini-badge">{{ stats.active_hours_count }} horarios ativos</span>
+        </div>
+
+        <form method="post" action="{{ url_for('update_business_hours') }}" class="appointment-form compact-form admin-inline-form business-hours-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <section class="admin-subpanel">
+            <div class="admin-subpanel__header">
+              <strong>Selecione os horarios</strong>
+              <span>06:00 ate 00:00</span>
+            </div>
+            <div class="working-hours-grid">
+              {% for item in available_hours %}
+                <label class="working-hour-chip">
+                  <input type="checkbox" name="selected_hours" value="{{ item.hour_label }}" {% if item.active %}checked{% endif %} />
+                  <span>{{ item.hour_label }}</span>
+                </label>
+              {% endfor %}
+            </div>
+          </section>
+
+          <div class="admin-tool-group__text">
+            A cliente so consegue escolher os horarios que estiverem marcados aqui.
+          </div>
+
+          <button type="submit" class="button button--primary button--full">Salvar horários</button>
+        </form>
+      </section>
+    </section>
+  </main>
+{% endblock %}

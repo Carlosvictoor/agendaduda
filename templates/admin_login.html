@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Login admin | {{ brand_name }}{% endblock %}
+
+{% block body_class %}theme-admin{% endblock %}
+
+{% block content %}
+  <main class="page-shell page-shell--narrow">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <section class="flash-stack">
+          {% for category, message in messages %}
+            <article class="flash flash-{{ category }}">{{ message }}</article>
+          {% endfor %}
+        </section>
+      {% endif %}
+    {% endwith %}
+
+    <section class="login-card panel">
+      <p class="kicker">Painel reservado</p>
+      <h1>Entrar no admin</h1>
+      <p class="hero__text">Acompanhe financeiro, clientes agendadas e abra conversas no WhatsApp com um clique.</p>
+
+      <form method="post" class="appointment-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <label>
+          <span>Usuario</span>
+          <input type="text" name="username" placeholder="duda" required />
+        </label>
+
+        <label>
+          <span>Senha</span>
+          <input type="password" name="password" placeholder="******" required />
+        </label>
+
+        <button type="submit" class="button button--primary button--full">Entrar</button>
+      </form>
+
+      <p class="login-hint">O acesso agora usa senha com hash no banco. Na primeira entrada, use o usuario e senha iniciais e depois altere no painel.</p>
+    </section>
+  </main>
+{% endblock %}

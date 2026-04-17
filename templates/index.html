@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ brand_name }}{% endblock %}
+
+{% block content %}
+  <main class="page-shell">
+    <section class="hero hero--premium">
+      <div class="hero__content panel panel--hero">
+        <p class="kicker">Agendamento facil e rapido</p>
+        <h1>Duda Leumann Nails</h1>
+        <p class="hero__text">
+          Escolha o servico, preencha seus dados e reserve seu horario em poucos passos. Simples para a cliente e organizado para a Duda.
+        </p>
+
+        <div class="hero__actions">
+          <a href="#booking" class="button button--primary">Agendar horario</a>
+          <a href="#booking" class="button button--secondary">Preencher agora</a>
+        </div>
+
+        <div class="hero__benefits">
+          <article>
+            <strong>1</strong>
+            <span>escolha o servico ideal</span>
+          </article>
+          <article>
+            <strong>2</strong>
+            <span>selecione data e horario</span>
+          </article>
+          <article>
+            <strong>3</strong>
+            <span>receba confirmacao da Duda</span>
+          </article>
+        </div>
+
+        <div class="quick-service-picker quick-service-picker--hero">
+          <span>Servicos</span>
+          <div class="quick-service-picker__grid">
+            {% for service in services %}
+              <button type="button" class="quick-service-button" data-service-trigger="{{ service.name }}">
+                <strong>{{ service.name }}</strong>
+                <small>{{ service.price|currency_br }} • {{ service.duration_label }}</small>
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <aside id="booking" class="hero__aside hero__aside--booking panel panel--form">
+        <div class="panel-heading panel-heading--split">
+          <div>
+            <p class="section-label">Agendamento</p>
+            <h2>Reserve seu horario</h2>
+          </div>
+          <span class="panel-chip">leva menos de 1 minuto</span>
+        </div>
+
+        <div class="booking-steps">
+          <article>
+            <strong>1</strong>
+            <span>Seus dados</span>
+          </article>
+          <article>
+            <strong>2</strong>
+            <span>Servico e horario</span>
+          </article>
+          <article>
+            <strong>3</strong>
+            <span>Observacoes finais</span>
+          </article>
+        </div>
+
+        <form method="post" class="appointment-form" data-booking-form>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <label>
+            <span>Nome da cliente</span>
+            <input type="text" name="client_name" placeholder="Ex.: Maria Clara" required />
+          </label>
+
+          <label>
+            <span>WhatsApp</span>
+            <input type="text" name="phone" placeholder="(11) 99999-9999" maxlength="15" inputmode="numeric" data-phone-mask required />
+          </label>
+
+          <label class="service-select-label">
+            <span>Servico</span>
+            <select name="service" data-service-select required>
+              <option value="" disabled selected>Selecione um servico</option>
+              {% for service in services %}
+                <option value="{{ service.name }}">{{ service.name }} - {{ service.price|currency_br }} - {{ service.duration_label }}</option>
+              {% endfor %}
+            </select>
+          </label>
+
+          <div class="field-row">
+            <label>
+              <span>Data</span>
+              <input type="date" name="appointment_date" min="{{ min_date }}" data-date-input required />
+            </label>
+
+            <input type="hidden" name="appointment_time" data-time-input required />
+          </div>
+
+          <div class="slot-picker">
+            <div class="slot-picker__header">
+              <span>Horario</span>
+              <small data-slot-message>Selecione uma data para ver os horarios que a Duda liberou para atendimento.</small>
+            </div>
+            <div class="slot-picker__grid" data-slot-grid>
+              {% for slot in working_hours %}
+                <button type="button" class="slot-button is-disabled" disabled>{{ slot }}</button>
+              {% endfor %}
+            </div>
+          </div>
+
+          <label>
+            <span>Observacoes</span>
+            <textarea name="notes" rows="4" placeholder="Inspiracao, acabamento, cores ou detalhes do atendimento"></textarea>
+          </label>
+
+          <button type="submit" class="button button--primary button--full">Salvar agendamento</button>
+        </form>
+      </aside>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <section class="flash-stack">
+          {% for category, message in messages %}
+            <article class="flash flash-{{ category }}">{{ message }}</article>
+          {% endfor %}
+        </section>
+      {% endif %}
+    {% endwith %}
+
+  </main>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}

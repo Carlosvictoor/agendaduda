@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Agendada com sucesso | {{ brand_name }}{% endblock %}
+
+{% block content %}
+  <main class="page-shell page-shell--narrow">
+    <section class="panel success-panel">
+      <p class="kicker">Confirmacao</p>
+      <h1>Agendada com sucesso</h1>
+      <p class="hero__text">
+        Seu pedido foi enviado para a Duda Leumann Nails. Se precisar ajustar algo, o contato sera feito pelo WhatsApp informado.
+      </p>
+
+      <div class="success-summary">
+        <article>
+          <span>Cliente</span>
+          <strong>{{ appointment.client_name }}</strong>
+        </article>
+        <article>
+          <span>Servico</span>
+          <strong>{{ appointment.service }}</strong>
+        </article>
+        <article>
+          <span>Data</span>
+          <strong>{{ appointment.appointment_date.strftime('%d/%m/%Y') }}</strong>
+        </article>
+        <article>
+          <span>Horario</span>
+          <strong>{{ appointment.appointment_time }}</strong>
+        </article>
+      </div>
+
+      <div class="hero__actions">
+        <a href="{{ url_for('index') }}" class="button button--primary">Fazer novo agendamento</a>
+      </div>
+    </section>
+  </main>
+{% endblock %}

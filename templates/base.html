@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}{{ brand_name }}{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  </head>
+  <body class="{% block body_class %}theme-public{% endblock %}">
+    <div class="page-backdrop page-backdrop-one"></div>
+    <div class="page-backdrop page-backdrop-two"></div>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a href="{{ url_for('index') }}" class="brand-mark">
+          <span class="brand-mark__seal">DL</span>
+          <span>
+            <strong>{{ brand_name }}</strong>
+            <small>Studio de agendamentos</small>
+          </span>
+        </a>
+
+        <button type="button" class="mobile-nav-toggle" data-mobile-nav-toggle aria-expanded="false" aria-controls="site-nav" aria-label="Abrir menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav id="site-nav" class="site-nav" data-mobile-nav>
+          <a href="{{ url_for('index') }}" class="site-nav__link {% if request.endpoint == 'index' %}is-active{% endif %}">Agenda</a>
+          {% if is_admin %}
+            <a href="{{ url_for('admin_dashboard') }}" class="site-nav__link {% if request.endpoint == 'admin_dashboard' %}is-active{% endif %}">Painel admin</a>
+            <a href="{{ url_for('admin_settings') }}" class="site-nav__link {% if request.endpoint == 'admin_settings' %}is-active{% endif %}">Configurações</a>
+            <a href="{{ url_for('admin_change_password') }}" class="site-nav__link {% if request.endpoint == 'admin_change_password' %}is-active{% endif %}">Mudar senha</a>
+            <a href="{{ url_for('admin_logout') }}" class="site-nav__button">Sair</a>
+          {% else %}
+            <a href="{{ url_for('admin_login') }}" class="site-nav__button">Area da Duda</a>
+          {% endif %}
+        </nav>
+      </div>
+    </header>
+    {% block content %}{% endblock %}
+
+    <nav class="mobile-dock" aria-label="Atalhos rapidos mobile">
+      <a href="{{ url_for('index') }}" class="mobile-dock__item {% if request.endpoint == 'index' %}is-active{% endif %}">
+        <span class="mobile-dock__icon">◎</span>
+        <span>Agenda</span>
+      </a>
+      {% if is_admin %}
+        <a href="{{ url_for('admin_dashboard') }}" class="mobile-dock__item {% if request.endpoint == 'admin_dashboard' %}is-active{% endif %}">
+          <span class="mobile-dock__icon">◌</span>
+          <span>Admin</span>
+        </a>
+        <a href="{{ url_for('admin_settings') }}" class="mobile-dock__item {% if request.endpoint == 'admin_settings' %}is-active{% endif %}">
+          <span class="mobile-dock__icon">⋄</span>
+          <span>Config.</span>
+        </a>
+        <a href="{{ url_for('admin_change_password') }}" class="mobile-dock__item {% if request.endpoint == 'admin_change_password' %}is-active{% endif %}">
+          <span class="mobile-dock__icon">⌁</span>
+          <span>Senha</span>
+        </a>
+        <a href="{{ url_for('admin_logout') }}" class="mobile-dock__item mobile-dock__item--accent">
+          <span class="mobile-dock__icon">↗</span>
+          <span>Sair</span>
+        </a>
+      {% else %}
+        <a href="{{ url_for('index') }}#booking" class="mobile-dock__item mobile-dock__item--accent">
+          <span class="mobile-dock__icon">+</span>
+          <span>Agendar</span>
+        </a>
+        <a href="{{ url_for('admin_login') }}" class="mobile-dock__item {% if request.endpoint == 'admin_login' %}is-active{% endif %}">
+          <span class="mobile-dock__icon">◌</span>
+          <span>Area Duda</span>
+        </a>
+      {% endif %}
+    </nav>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
