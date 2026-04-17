@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: agendaduda
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT wsgi:application
+    autoDeploy: true
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SESSION_COOKIE_SECURE
+        value: "1"
+      - key: ADMIN_USERNAME
+        value: duda
+      - key: ADMIN_PASSWORD
+        value: 199612@Vs

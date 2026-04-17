@@ -3,23 +3,44 @@ import re
 import secrets
 from datetime import date, datetime, timedelta
 from functools import wraps
+from pathlib import Path
 from urllib.parse import quote
 
 from flask import Flask, abort, flash, jsonify, redirect, render_template, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.middleware.proxy_fix import ProxyFix
+
+
+BASE_DIR = Path(__file__).resolve().parent
+INSTANCE_DIR = BASE_DIR / "instance"
+INSTANCE_DIR.mkdir(exist_ok=True)
+
+
+def database_uri_from_env():
+    database_url = os.getenv("DATABASE_URL", "").strip()
+    if database_url:
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql://", 1)
+        return database_url
+
+    sqlite_path = INSTANCE_DIR / "agenda.db"
+    return f"sqlite:///{sqlite_path.as_posix()}"
 
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY") or secrets.token_hex(32)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///agenda.db"
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY") or "dev-secret-change-in-production"
+app.config["SQLALCHEMY_DATABASE_URI"] = database_uri_from_env()
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True}
 app.config["MAX_CONTENT_LENGTH"] = 1024 * 1024
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Strict"
 app.config["SESSION_COOKIE_SECURE"] = os.getenv("SESSION_COOKIE_SECURE", "0") == "1"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=8)
+app.config["PREFERRED_URL_SCHEME"] = "https"
 
 db = SQLAlchemy(app)
 
