@@ -10,7 +10,7 @@
       <div>
         <p class="kicker">Configurações</p>
         <h1>Ajustes do studio</h1>
-        <p class="hero__text">Marque apenas os horarios em que a Duda vai atender. As clientes vao ver exatamente esses horarios disponiveis.</p>
+        <p class="hero__text">Marque os horarios em que a Duda atende. Esses mesmos horarios valem para todos os dias e sao exatamente os horarios que as clientes vao ver.</p>
       </div>
       <div class="admin-hero__note">
         <span>Resumo</span>
@@ -113,7 +113,7 @@
           <section class="admin-subpanel">
             <div class="admin-subpanel__header">
               <strong>Selecione os horarios</strong>
-              <span>06:00 ate 00:00</span>
+              <span>06:00 ate 00:00 • igual para todos os dias</span>
             </div>
             <div class="working-hours-grid">
               {% for item in available_hours %}
@@ -126,7 +126,7 @@
           </section>
 
           <div class="admin-tool-group__text">
-            A cliente so consegue escolher os horarios que estiverem marcados aqui.
+            A cliente so consegue escolher os horarios que estiverem marcados aqui, e essa lista vale para todos os dias.
           </div>
 
           <button type="submit" class="button button--primary button--full">Salvar horários</button>

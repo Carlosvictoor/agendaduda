@@ -14,7 +14,7 @@ Aplicacao web simples para registrar agendamentos usando Python, HTML e CSS, pro
 - Cadastro e edicao de servicos e precos pela pagina de Configurações
 - Mensagem personalizada no link do WhatsApp com servico, data e horario
 - Duracao estimada por servico
-- Horarios de funcionamento marcados pela dona na pagina de Configurações, de 06:00 ate 00:00
+- Horarios de funcionamento marcados pela dona na pagina de Configurações, de 06:00 ate 00:00, valendo para todos os dias
 - Tela final com confirmacao Agendada com sucesso
 
 ## Tecnologias
